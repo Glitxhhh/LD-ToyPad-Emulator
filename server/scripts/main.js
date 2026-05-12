@@ -305,17 +305,16 @@ $(function () {
     var content = "<h3>" + itemData.name + "</h3>";
     var path = "images/" + itemData.id + ".png";
     var url = $(location).attr("href") + "/../" + path;
-    if (fileExists(url)) {
+    var hasImage = fileExists(url);
+    if (hasImage) {
       content =
-        "<img src=" +
-        path +
-        " alt=" +
-        itemData.name +
-        " style='width: 100%; height: 100%; object-fit: contain; pointer-events: none;'>";
+        "<img src='" + path + "' alt='" + itemData.name +
+        "' style='width:100%;flex:1;min-height:0;object-fit:contain;pointer-events:none;'>" +
+        "<strong class='token-name'>" + itemData.name + "</strong>";
     }
 
     return (
-      "<li class=item draggable=true data-name=" +
+      "<li class='item" + (hasImage ? " has-image" : "") + "' draggable=true data-name=" +
       item.name +
       " data-type=" +
       item.type +
@@ -370,7 +369,10 @@ $(function () {
   function applyNameFilter() {
     var text = $("#name-filter").val().toLowerCase();
     $(".item").each(function (index, item) {
-      var name = $(item).text().toLowerCase();
+      // Explicitly target the name-bearing element so tokens with images
+      // (which use .token-name instead of h3) are filtered correctly.
+      var nameEl = $(item).find("h3, .token-name").first();
+      var name = (nameEl.length ? nameEl.text() : $(item).text()).toLowerCase().trim();
       if (!name.includes(text)) {
         $(item).addClass("filtered");
       }
