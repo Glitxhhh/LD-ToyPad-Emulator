@@ -150,7 +150,7 @@ Flash **Raspberry Pi OS (Legacy, 32-bit) Lite** onto your SD card using the [Ras
 Connect your Pi to power, wait for it to boot, SSH in, then run:
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_FORK/LD-ToyPad-Emulator/master/setup.sh | bash
+curl -sSL https://raw.githubusercontent.com/Glitxhhh/LD-ToyPad-Emulator/master/setup.sh | bash
 ```
 
 This automatically detects your hardware, installs everything, configures PS4/PS5 USB compatibility, sets up mDNS, and reboots. After reboot, the emulator is available at:
@@ -161,8 +161,6 @@ http://toypad.local
 
 No port number required.
 
-> Replace `YOUR_FORK` with your GitHub username.
-
 #### Step 2 (manual) — Run these commands instead
 
 If you prefer to set up manually:
@@ -170,7 +168,7 @@ If you prefer to set up manually:
 **2a. USB gadget + dependencies:**
 
 ```bash
-curl -sSL https://raw.githubusercontent.com/YOUR_FORK/LD-ToyPad-Emulator/master/pi_setup.sh | bash
+curl -sSL https://raw.githubusercontent.com/Glitxhhh/LD-ToyPad-Emulator/master/pi_setup.sh | bash
 ```
 
 **2b. Reboot:**
