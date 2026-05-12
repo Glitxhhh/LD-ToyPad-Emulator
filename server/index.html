@@ -1,218 +1,151 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!--
-
-	Copyright © 2023 Berny23, Cort1237 and many more
+	Copyright © 2023 Berny23, Cort1237, Glitxh and many more
 	
 	This file is part of "Toy Pad Emulator for Lego Dimensions" which is released under the "MIT" license.
 	See file "LICENSE" or go to "https://choosealicense.com/licenses/mit" for full license details.
-
 -->
-
-<html>
+<html data-theme="dark">
   <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>Toy Pad Emulator for Lego Dimensions | v1.4.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toy Pad Emulator for Lego Dimensions | v1.5.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="stylesheets/main.css" />
     <link rel="icon" href="favicon.ico" type="image/x-icon" />
-    <script
-      src="https://code.jquery.com/jquery-3.6.0.min.js"
-      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
   </head>
-
   <body>
     <div id="focus">
-      <h1 id="header">Toy Pad Emulator for Lego Dimensions</h1>
-      <div id="warnings" class="container">
-        Create characters and vehicles with the boxes at the top, then drag them
-        to the Toy Pad.
-        <br />
-        <b
-          >If you encounter a token that is not responding, move it to the toy
-          box and then back to the Toy Pad.</b
-        >
-        <br />
-        <button id="sync" type="button">
-          Things Not Working? Click Here To Sync!
-        </button>
-      </div>
-      <div id="tag-creation-container">
-        <form id="character-select" class="container">
-          <label>
-            <input
-              list="character-list"
-              id="character-name"
-              onfocus="this.value=''"
-              onchange="this.blur();"
-              placeholder="Select a character"
-            />
-            <datalist id="character-list"></datalist>
-          </label>
-          <br />
-          <button type="submit">Create Character</button>
-        </form>
 
-        <form id="vehicle-select" class="container">
-          <label>
-            <input
-              list="vehicle-list"
-              id="vehicle-name"
-              onfocus="this.value=''"
-              onchange="this.blur();"
-              placeholder="Select a vehicle"
-            />
-            <datalist id="vehicle-list"></datalist>
-          </label>
-          <br />
-          <button type="submit">Create Vehicle</button>
+      <header id="app-header">
+        <div id="header-left">
+          <div id="logo-mark" aria-hidden="true">
+            <span class="logo-stud"></span><span class="logo-stud"></span>
+            <span class="logo-stud"></span><span class="logo-stud"></span>
+          </div>
+          <h1 id="header">Toy Pad Emulator <span class="header-sub">for Lego Dimensions</span></h1>
+        </div>
+        <div id="header-controls">
+          <button id="hotkey-help-btn" title="Keyboard shortcuts">&#9000; Keys</button>
+          <button id="theme-toggle" aria-label="Toggle theme" title="Toggle light/dark mode">
+            <svg id="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <svg id="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Hotkey help overlay -->
+      <div id="hotkey-overlay">
+        <div id="hotkey-panel">
+          <div id="hotkey-panel-header">
+            <span>Keyboard Shortcuts</span>
+            <button id="hotkey-close">&#x2715;</button>
+          </div>
+          <p class="hotkey-desc">Click a token in the Toy Box to select it (it will glow), then press a number key to place it on that pad slot. Press the same number again to return it to the Toy Box.</p>
+          <div class="hotkey-grid">
+            <div class="hotkey-row"><kbd>1</kbd><span>Left pad &mdash; top</span></div>
+            <div class="hotkey-row"><kbd>2</kbd><span>Center pad</span></div>
+            <div class="hotkey-row"><kbd>3</kbd><span>Right pad &mdash; top</span></div>
+            <div class="hotkey-row"><kbd>4</kbd><span>Left pad &mdash; bottom left</span></div>
+            <div class="hotkey-row"><kbd>5</kbd><span>Left pad &mdash; bottom right</span></div>
+            <div class="hotkey-row"><kbd>6</kbd><span>Right pad &mdash; bottom left</span></div>
+            <div class="hotkey-row"><kbd>7</kbd><span>Right pad &mdash; bottom right</span></div>
+            <div class="hotkey-row"><kbd>0</kbd><span>Deselect token</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="warnings" class="container">
+        <span>Create characters and vehicles above, then drag or use number keys to place them on the Toy Pad.</span>
+        <span class="warning-hint">If a token stops responding, move it to the Toy Box and back.</span>
+        <button id="sync" type="button">&#x27F3; Sync</button>
+      </div>
+
+      <div id="tag-creation-container">
+        <form id="character-select" class="container creation-card">
+          <label class="creation-label">Character</label>
+          <input list="character-list" id="character-name" onfocus="this.value=''" onchange="this.blur();" placeholder="Search characters&hellip;" />
+          <datalist id="character-list"></datalist>
+          <button type="submit">+ Add Character</button>
+        </form>
+        <form id="vehicle-select" class="container creation-card">
+          <label class="creation-label">Vehicle</label>
+          <input list="vehicle-list" id="vehicle-name" onfocus="this.value=''" onchange="this.blur();" placeholder="Search vehicles&hellip;" />
+          <datalist id="vehicle-list"></datalist>
+          <button type="submit" class="vehicle-btn">+ Add Vehicle</button>
         </form>
       </div>
-      <br />
+
       <div id="layout-controller">
         <div id="toybox-column" class="flex-container layout-column">
-          <h2>Toy Box</h2>
+          <div id="toybox-header">
+            <h2>Toy Box</h2>
+            <div id="filter-container">
+              <div class="filter">
+                <input id="name-filter" type="search" name="name-filter" placeholder="Filter by name&hellip;" />
+              </div>
+              <div class="filter">
+                <input list="world-list" id="tag-world-filter" type="search" name="tag-world-filter" class="filter-input" placeholder="Filter by world&hellip;" />
+                <datalist id="world-list"></datalist>
+              </div>
+              <div class="filter">
+                <input list="ability-list" id="tag-ability-filter" type="search" name="tag-ability-filter" class="filter-input" placeholder="Filter by ability&hellip;" />
+                <datalist id="ability-list"></datalist>
+              </div>
+              <button id="clear-filters">&#x2715; Clear</button>
+            </div>
+          </div>
           <div id="token-box" class="flex-container">
             <div class="TokenTools">
               <ul id="remove-tokens" class="box box-edit" pad-num="-2">
-                <li
-                  class="item drag-disabled"
-                  draggable="false"
-                  id="deleteToken"
-                >
-                  <svg viewBox="0 0 80 18">
-                    <text x="0" y="15">&nbsp;&nbsp;Drag to</text>
-                  </svg>
-                  <svg viewBox="0 0 80 18">
-                    <text x="0" y="15">&nbsp;&nbsp;this side</text>
-                  </svg>
-                  <svg viewBox="0 0 80 18">
-                    <text x="0" y="15">&nbsp;&nbsp;to delete</text>
-                  </svg>
-                  <svg viewBox="0 0 70 18">
-                    <text x="0" y="15">
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;➜
-                    </text>
-                  </svg>
+                <li class="item drag-disabled" draggable="false" id="deleteToken">
+                  <div class="delete-label">
+                    <span>Drag</span>
+                    <span>here to</span>
+                    <span>delete</span>
+                    <span class="delete-arrow">&#x2715;</span>
+                  </div>
                 </li>
               </ul>
             </div>
             <ul id="toybox-tokens" class="box" pad-num="-1"></ul>
           </div>
-          <div id="filter-container">
-            <div class="filter">
-              <input
-                id="name-filter"
-                type="search"
-                name="name-filter"
-                placeholder="Filter by name..."
-              />
-            </div>
-            <div class="filter">
-              <input
-                list="world-list"
-                id="tag-world-filter"
-                type="search"
-                name="tag-world-filter"
-                class="filter-input"
-                placeholder="Filter by world..."
-              />
-              <datalist id="world-list"></datalist>
-            </div>
-            <div class="filter">
-              <input
-                list="ability-list"
-                id="tag-ability-filter"
-                type="search"
-                name="tag-ability-filter"
-                class="filter-input"
-                placeholder="Filter by ability..."
-              />
-              <datalist id="ability-list"></datalist>
-            </div>
-            <br />
-            <button id="clear-filters">Clear all filters</button>
-          </div>
         </div>
 
         <div id="toypad-column" class="layout-column">
           <p id="status" class="container">
-            WARNING: Do not place any characters, I have not communicated with
-            the game yet.<br />
-            Placing characters now will cause me to crash. <br />
-            This message will disappear when I can see the game.
+            &#9888; Not connected to the game yet &mdash; do not place characters until this message disappears.
           </p>
-
           <div id="toypad" class="container">
-            <h1>The Toy Pad</h1>
+            <h2 id="toypad-title">The Toy Pad</h2>
+            <div class="pad-stud-bar" aria-hidden="true"></div>
             <div>
               <div class="drop-targets">
-                <div
-                  id="toypad1"
-                  class="box"
-                  pad-num="2"
-                  pad-index="1"
-                  color="white"
-                ></div>
-                <div class="box" style="visibility: hidden"></div>
-                <div
-                  id="toypad2"
-                  class="box"
-                  pad-num="1"
-                  pad-index="2"
-                  color="white"
-                ></div>
-                <div class="box" style="visibility: hidden"></div>
-                <div
-                  id="toypad3"
-                  class="box"
-                  pad-num="3"
-                  pad-index="3"
-                  color="white"
-                ></div>
+                <div id="toypad1" class="box" pad-num="2" pad-index="1" color="white"><span class="slot-key">1</span></div>
+                <div class="box" style="visibility:hidden"></div>
+                <div id="toypad2" class="box" pad-num="1" pad-index="2" color="white"><span class="slot-key">2</span></div>
+                <div class="box" style="visibility:hidden"></div>
+                <div id="toypad3" class="box" pad-num="3" pad-index="3" color="white"><span class="slot-key">3</span></div>
               </div>
               <div class="drop-targets">
-                <div
-                  id="toypad4"
-                  class="box"
-                  pad-num="2"
-                  pad-index="4"
-                  color="white"
-                ></div>
-                <div
-                  id="toypad5"
-                  class="box"
-                  pad-num="2"
-                  pad-index="5"
-                  color="white"
-                ></div>
-                <div class="box" style="visibility: hidden"></div>
-                <div
-                  id="toypad6"
-                  class="box"
-                  pad-num="3"
-                  pad-index="6"
-                  color="white"
-                ></div>
-                <div
-                  id="toypad7"
-                  class="box"
-                  pad-num="3"
-                  pad-index="7"
-                  color="white"
-                ></div>
+                <div id="toypad4" class="box" pad-num="2" pad-index="4" color="white"><span class="slot-key">4</span></div>
+                <div id="toypad5" class="box" pad-num="2" pad-index="5" color="white"><span class="slot-key">5</span></div>
+                <div class="box" style="visibility:hidden"></div>
+                <div id="toypad6" class="box" pad-num="3" pad-index="6" color="white"><span class="slot-key">6</span></div>
+                <div id="toypad7" class="box" pad-num="3" pad-index="7" color="white"><span class="slot-key">7</span></div>
               </div>
             </div>
+            <div class="pad-stud-bar" aria-hidden="true"></div>
           </div>
         </div>
       </div>
 
       <p id="footer">
-        Copyright © 2023 Berny23, Cort1237 and many more | <b>v1.4.1</b> | This
-        software is licensed under the
-        <a href="https://choosealicense.com/licenses/mit">MIT</a> license. The
-        source code is available on
-        <a href="https://github.com/Berny23/LD-ToyPad-Emulator">GitHub</a>.
+        Copyright &copy; 2023 Berny23, Cort1237, Glitxh and many more | <b>v1.5.0</b> |
+        Licensed under the <a href="https://choosealicense.com/licenses/mit">MIT</a> license |
+        <a href="https://github.com/Berny23/LD-ToyPad-Emulator">GitHub</a>
       </p>
     </div>
 
@@ -220,11 +153,243 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="jquery.ui.touch-punch.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script
-      src="https://code.jquery.com/color/jquery.color-2.2.0.min.js"
-      integrity="sha256-aSe2ZC5QeunlL/w/7PsVKmV+fa0eDbmybn/ptsKHR6I="
-      crossorigin="anonymous"
-    ></script>
+    <script src="https://code.jquery.com/color/jquery.color-2.2.0.min.js" integrity="sha256-aSe2ZC5QeunlL/w/7PsVKmV+fa0eDbmybn/ptsKHR6I=" crossorigin="anonymous"></script>
     <script src="scripts/main.js"></script>
+
+    <script>
+      // ── Theme Toggle ──────────────────────────────────────────────────────
+      var html     = document.documentElement;
+      var toggle   = document.getElementById('theme-toggle');
+      var iconMoon = document.getElementById('icon-moon');
+      var iconSun  = document.getElementById('icon-sun');
+      var saved    = localStorage.getItem('theme') || 'dark';
+      html.setAttribute('data-theme', saved);
+      if (saved === 'light') { iconMoon.style.display = 'none'; iconSun.style.display = 'block'; }
+      toggle.addEventListener('click', function() {
+        var next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        iconMoon.style.display = next === 'dark'  ? 'block' : 'none';
+        iconSun.style.display  = next === 'light' ? 'block' : 'none';
+      });
+
+      // ── Hotkey Help Overlay ───────────────────────────────────────────────
+      document.getElementById('hotkey-help-btn').addEventListener('click', function() {
+        document.getElementById('hotkey-overlay').classList.add('visible');
+      });
+      document.getElementById('hotkey-close').addEventListener('click', function() {
+        document.getElementById('hotkey-overlay').classList.remove('visible');
+      });
+      document.getElementById('hotkey-overlay').addEventListener('click', function(e) {
+        if (e.target === this) this.classList.remove('visible');
+      });
+
+      // ── Toast helper ──────────────────────────────────────────────────────
+      function showToast(msg, type) {
+        var t = $('<div class="toast toast-' + (type || '') + '">' + msg + '</div>');
+        $('body').append(t);
+        setTimeout(function() { t.addClass('toast-visible'); }, 10);
+        setTimeout(function() {
+          t.removeClass('toast-visible');
+          setTimeout(function() { t.remove(); }, 300);
+        }, 2200);
+      }
+
+      // ── Image Cycling System ──────────────────────────────────────────────
+      // Naming convention: 1.png = primary image for character/vehicle 1
+      //   Extra alternates: 1_1.png, 1_2.png, 1_3.png ... (up to however many exist)
+      // Images cycle automatically every CYCLE_MS milliseconds with a fade transition.
+      $(function() {
+        var CYCLE_MS = 20000; // 20 seconds — adjust to taste
+
+        // Probe for extra images async: tries id_1.png, id_2.png etc. until 404
+        function probeExtras(id, $el) {
+          var allSrcs = ['images/' + id + '.png']; // primary always first
+          var n = 1;
+          function tryNext() {
+            var src = 'images/' + id + '_' + n + '.png';
+            var img = new Image();
+            img.onload = function() {
+              allSrcs.push(src);
+              n++;
+              tryNext();
+            };
+            img.onerror = function() {
+              // Only bother storing if there are actually extras
+              if (allSrcs.length > 1) {
+                $el.data('cycle-images', allSrcs);
+                $el.data('cycle-index', 0);
+              }
+            };
+            img.src = src;
+          }
+          tryNext();
+        }
+
+        // Init cycling probe for all has-image tokens in a container
+        function initCycling($root) {
+          $root.find('.item.has-image').each(function() {
+            var $el = $(this);
+            if ($el.data('cycle-init')) return;
+            $el.data('cycle-init', true);
+            var id = ($el.attr('data-id') || '').trim();
+            if (id) probeExtras(id, $el);
+          });
+        }
+
+        // Smooth src swap: fade out → change → fade back in
+        function cycleTokenImage($el, newSrc) {
+          var $img = $el.find('img');
+          $img.css('opacity', 0);
+          setTimeout(function() {
+            $img.attr('src', newSrc);
+            $img.on('load.cycle error.cycle', function() {
+              $(this).off('.cycle').css('opacity', 1);
+            });
+            // Fallback if load event doesn't fire (cached)
+            if ($img[0] && $img[0].complete) $img.css('opacity', 1);
+          }, 400); // wait for fade-out before swapping
+        }
+
+        // Global cycle tick — advances all tokens with extras
+        setInterval(function() {
+          $('.item.has-image').each(function() {
+            var $el  = $(this);
+            var imgs = $el.data('cycle-images');
+            if (!imgs || imgs.length < 2) return;
+            var idx = (($el.data('cycle-index') || 0) + 1) % imgs.length;
+            $el.data('cycle-index', idx);
+            cycleTokenImage($el, imgs[idx]);
+          });
+        }, CYCLE_MS);
+
+        // Watch for tokens added/moved anywhere they can live
+        if (typeof MutationObserver !== 'undefined') {
+          var padIds = ['toybox-tokens','toypad1','toypad2','toypad3',
+                        'toypad4','toypad5','toypad6','toypad7'];
+          var observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(m) {
+              m.addedNodes.forEach(function(node) {
+                if (node.nodeType !== 1) return;
+                var $n = $(node);
+                // Direct .item.has-image addition
+                if ($n.hasClass('item') && $n.hasClass('has-image') && !$n.data('cycle-init')) {
+                  $n.data('cycle-init', true);
+                  var id = ($n.attr('data-id') || '').trim();
+                  if (id) probeExtras(id, $n);
+                }
+                // Container re-populated (e.g. after refreshToyBox)
+                $n.find && initCycling($n);
+              });
+            });
+          });
+          padIds.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) observer.observe(el, { childList: true });
+          });
+        }
+
+        // Initial probe after main.js has populated the toybox
+        setTimeout(function() { initCycling($('#toybox-tokens, #toypad1, #toypad2, #toypad3, #toypad4, #toypad5, #toypad6, #toypad7')); }, 1200);
+      });
+
+      // ── Hotkey Placement System ───────────────────────────────────────────
+      // NOTE: /place and /remove do not emit refreshTokens.
+      // UI is updated by manually moving DOM elements after each AJAX call.
+      $(function() {
+        var PAD_SLOTS = {
+          '1': { el: '#toypad1', padNum: 2, padIndex: 1 },
+          '2': { el: '#toypad2', padNum: 1, padIndex: 2 },
+          '3': { el: '#toypad3', padNum: 3, padIndex: 3 },
+          '4': { el: '#toypad4', padNum: 2, padIndex: 4 },
+          '5': { el: '#toypad5', padNum: 2, padIndex: 5 },
+          '6': { el: '#toypad6', padNum: 3, padIndex: 6 },
+          '7': { el: '#toypad7', padNum: 3, padIndex: 7 },
+        };
+
+        var $selected = null;
+
+        // Invalidate $selected if toybox is rebuilt by refreshToyBox()
+        if (typeof MutationObserver !== 'undefined') {
+          new MutationObserver(function() {
+            if ($selected && !document.contains($selected[0])) $selected = null;
+          }).observe(document.getElementById('toybox-tokens'), { childList: true });
+        }
+
+        $(document).on('click', '#toybox-tokens .item', function(e) {
+          e.stopPropagation();
+          if ($selected && $selected[0] === this) {
+            $selected.removeClass('token-selected');
+            $selected = null;
+          } else {
+            if ($selected) $selected.removeClass('token-selected');
+            $selected = $(this);
+            $selected.addClass('token-selected');
+          }
+        });
+
+        $(document).on('click', function(e) {
+          if ($selected && !$(e.target).closest('#toybox-tokens').length) {
+            $selected.removeClass('token-selected');
+            $selected = null;
+          }
+        });
+
+        $(document).on('keydown', function(e) {
+          if ($(e.target).is('input, textarea, select')) return;
+
+          if (e.key === '0') {
+            if ($selected) {
+              $selected.removeClass('token-selected');
+              $selected = null;
+              showToast('Deselected', '');
+            }
+            return;
+          }
+
+          var slot = PAD_SLOTS[e.key];
+          if (!slot) return;
+          e.preventDefault();
+
+          var $slotEl   = $(slot.el);
+          var $existing = $slotEl.children('.item');
+
+          $slotEl.addClass('slot-flash');
+          setTimeout(function() { $slotEl.removeClass('slot-flash'); }, 350);
+
+          if ($existing.length) {
+            var $token  = $existing;
+            var tokName = $token.find('h3, .token-name').first().text() || 'Token';
+            $.ajax({
+              method: 'DELETE', contentType: 'application/json', url: '/remove',
+              data: JSON.stringify({ index: slot.padIndex, uid: $token.attr('data-uid') }),
+            }).done(function() {
+              $token.removeClass('filtered');
+              $('#toybox-tokens').append($token.detach());
+              showToast('&#8617; ' + tokName + ' returned to Toy Box', 'remove');
+            });
+
+          } else if ($selected) {
+            var $toPlace = $selected;
+            $selected.removeClass('token-selected');
+            $selected = null;
+            var tokName = $toPlace.find('h3, .token-name').first().text() || 'Token';
+            $.ajax({
+              method: 'POST', contentType: 'application/json', url: '/place',
+              data: JSON.stringify({
+                uid:      $toPlace.attr('data-uid'),
+                id:       parseInt($toPlace.attr('data-id')),
+                position: slot.padNum,
+                index:    slot.padIndex,
+              }),
+            }).done(function() {
+              $slotEl.append($toPlace.detach());
+              $toPlace.removeClass('filtered');
+              showToast('&#10003; ' + tokName + ' &rarr; Slot ' + e.key, 'place');
+            });
+          }
+        });
+      });
+    </script>
   </body>
 </html>
