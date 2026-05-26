@@ -6,13 +6,13 @@
 */
 
 const ld = require("node-ld");
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 
 //Setup Webserver
 const express = require("express");
 const app = express();
-const http = require("http");
+const http = require("node:http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
@@ -41,7 +41,7 @@ let isConnectedToGame = false;
 function createVehicle(id, uid, upgrades = [0, 0]) {
   const token = Buffer.alloc(180);
   token.uid = uid;
-  //console.log(upgrades);
+  
   token.writeUInt32LE(upgrades[0], 0x8c); //0x23 * 4
   token.writeUInt16LE(id, 0x90); //0x24 * 4
   token.writeUInt32LE(upgrades[1], 0x94); //0x25 * 4
@@ -63,9 +63,7 @@ function getTokenNameFromID(id) {
   const data = fs.readFileSync(tokenmapPath, "utf8");
   const dataset = JSON.parse(data);
 
-  for (let i = 0; i < dataset.length; i++) {
-    const entry = dataset[i];
-
+  for (let entry of dataset) {
     if (entry.id == id) {
       return entry.name;
     }
@@ -78,9 +76,7 @@ function getCharacterNameFromID(id) {
   const data = fs.readFileSync(charactersMapPath, "utf8");
   const dataset = JSON.parse(data);
 
-  for (let i = 0; i < dataset.length; i++) {
-    const entry = dataset[i];
-
+  for (let entry of dataset) {
     if (entry.id == id) {
       return entry.name;
     }
@@ -101,9 +97,7 @@ function getJSONFromUID(uid) {
   const data = fs.readFileSync(toytagsPath, "utf8");
   const dataset = JSON.parse(data);
 
-  for (let i = 0; i < dataset.length; i++) {
-    const entry = dataset[i];
-
+  for (let entry of dataset) {
     if (entry.uid == uid) {
       return entry;
     }
@@ -117,9 +111,7 @@ function updatePadIndex(uid, index) {
   const data = fs.readFileSync(toytagsPath, "utf8");
   const dataset = JSON.parse(data);
 
-  for (let i = 0; i < dataset.length; i++) {
-    const entry = dataset[i];
-
+  for (let entry of dataset) {
     if (entry.uid == uid) {
       entry.index = index;
       break;
@@ -134,9 +126,7 @@ function updatePadIndex(uid, index) {
 function getUIDFromIndex(index) {
   const data = fs.readFileSync(toytagsPath, "utf8");
   const dataset = JSON.parse(data);
-  for (let i = 0; i < dataset.length; i++) {
-    const entry = dataset[i];
-
+  for (let entry of dataset) {
     if (entry.index == index) {
       return entry.uid;
     }
@@ -150,9 +140,7 @@ function writeJSONData(uid, datatype, value) {
   const tags = fs.readFileSync(toytagsPath, "utf8");
   const dataset = JSON.parse(tags);
 
-  for (let i = 0; i < dataset.length; i++) {
-    const entry = dataset[i];
-
+  for (let entry of dataset) {
     if (entry.uid == uid) {
       entry[datatype] = value;
       break;
@@ -168,9 +156,7 @@ function writeJSONBundle(uid, bundle) {
   const tags = fs.readFileSync(toytagsPath, "utf8");
   const dataset = JSON.parse(tags);
 
-  for (let i = 0; i < dataset.length; i++) {
-    const entry = dataset[i];
-
+  for (let entry of dataset) {
     if (entry.uid == uid) {
       bundle.forEach((data) => {
         entry[data.key] = data.value;
@@ -192,7 +178,6 @@ function initializeToyTagsJSON() {
   });
   fs.writeFileSync(toytagsPath, JSON.stringify(dataset, null, 4));
   console.log("Initialized toytags.JSON");
-  //io.emit("refreshTokens");
 }
 
 function RGBToHex(r, g, b) {
@@ -227,10 +212,6 @@ function RGBToHex(r, g, b) {
     //wyldstyle scanner
     case "#f00016":
       return "#ff2de6";
-
-    //batman stealth
-    case "#000018":
-      return "#0000ff";
 
     //shift keystone (dark colors for blink animation)
     case "#002007":
@@ -268,10 +249,6 @@ function RGBToHex(r, g, b) {
       return "#0000ff";
     case "#006700":
       return "#00ff00";
-    //case "#f00000":
-    //return "#ff0000";
-    case "#000016":
-      return "#00ffff";
 
     //scale keystone
     case "#ff1e00":
@@ -423,10 +400,6 @@ tp.hook(tp.CMD_FADAL, (req, res) => {
     right_pad_cycles,
     right_pad_color,
   ]);
-  // setTimeout(function(){io.emit("Fade All",
-  // 					[top_pad_speed, top_pad_cycles, 'white',
-  // 					 left_pad_speed, left_pad_cycles, 'white',
-  // 					 right_pad_speed, right_pad_cycles, 'white'])}, 2500);
 });
 
 ///NOT IMPLEMENTED///
@@ -545,8 +518,6 @@ app.post("/place", (request, response) => {
   console.log("Placing tag: " + request.body.id);
   const entry = getJSONFromUID(request.body.uid);
 
-  //console.log(entry.type);
-
   if (entry.type == "character") {
     const character = createCharacter(request.body.id, request.body.uid);
     tp.place(
@@ -618,7 +589,6 @@ app.post("/vehicle", (request, response) => {
 //This is called when a token needs to be removed from the pad.
 app.delete("/remove", (request, response) => {
   console.log("Removing item: " + request.body.index);
-  // console.log('DEBUG: pad-from-token: ', tp._tokens.filter(v => v.index == request.body.index)[0].pad);
   tp.remove(request.body.index);
   console.log("Item removed: " + request.body.index);
   updatePadIndex(request.body.uid, "-1");
@@ -633,16 +603,7 @@ io.on("connection", (socket) => {
     console.log("IO Recieved: Deleting entry " + uid + " from JSON");
     const tags = fs.readFileSync(toytagsPath, "utf8");
     const dataset = JSON.parse(tags);
-    let index = -1;
-
-    for (let i = 0; i < dataset.length; i++) {
-      const entry = dataset[i];
-
-      if (entry.uid == uid) {
-        index = i;
-        break;
-      }
-    }
+    const index = dataset.findIndex((entry) => entry.uid == uid);
 
     console.log("Entry to delete: ", index);
     if (index === -1) {
@@ -663,7 +624,7 @@ io.on("connection", (socket) => {
   });
 
   socket.on("connectionStatus", () => {
-    if (isConnectedToGame == true) {
+    if (isConnectedToGame) {
       io.emit("Connection True");
     }
   });
@@ -674,7 +635,6 @@ io.on("connection", (socket) => {
     for (let i = 1; i <= 7; i++) {
       const uid = getUIDAtPad(i);
       if (uid != -1) {
-        //console.log(uid, "is at pad #", i);
         writeJSONData(uid, "index", i);
       }
     }
