@@ -24,6 +24,24 @@ const charactersMapPath = path.join(__dirname, "server/json/charactermap.json");
 const tp = new ld.ToyPadEmu();
 tp.registerDefaults();
 
+// ── REAL PS4 COMPATIBILITY FIX ────────────────────────────────────────────
+// ROOT CAUSE: node-ld's ToyPadEmu queues tag-placed/removed events and only
+// flushes them every 500ms. Real PS4 hardware times out waiting for that
+// notification (~50-100ms) and disconnects. Emulators (Cemu/RPCS3) are
+// lenient and don't have this problem.
+//
+// FIX: Add a secondary drain at 16ms (~60Hz). The original 500ms drain
+// becomes a no-op since the queue is already empty by then. No node-ld
+// source modification needed.
+setInterval(() => {
+    if (tp._evqueue && tp._evqueue.length) {
+        while (tp._evqueue.length) {
+            tp._write(tp._evqueue.shift().build());
+        }
+    }
+}, 16);
+// ─────────────────────────────────────────────────────────────────────────
+
 initializeToyTagsJSON(); //Run in case there were any leftovers from a previous run.
 
 let isConnectedToGame = false;
