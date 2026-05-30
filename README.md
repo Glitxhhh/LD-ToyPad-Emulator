@@ -1,7 +1,6 @@
 # Toy Pad Emulator for Lego Dimensions
 
 <a href="https://www.buymeacoffee.com/Berny23" title="Donate to this project using Buy Me A Coffee"><img src="https://img.shields.io/badge/buy%20me%20a%20coffee-donate-yellow.svg" alt="Buy Me A Coffee donate button" /></a>
-</span>
 
 Allows you to connect an emulated Toy Pad to your PC or video-game console.
 
@@ -14,7 +13,9 @@ Allows you to connect an emulated Toy Pad to your PC or video-game console.
 - Supports smart scrolling for **mobile devices**
 - Can be run in a **virtual machine** on Windows, macOS and Linux
 - **No copyrighted game files are required**, nor are any included
-- Can be configured easily by following the instructions below
+- **Dark mode** with persistent preference
+- **Keyboard shortcuts** (1–7) to place/remove tokens without touching the mouse
+- **Custom character images** with automatic multi-image cycling
 
 ## Demo
 
@@ -23,9 +24,7 @@ Allows you to connect an emulated Toy Pad to your PC or video-game console.
 ## Videos
 
 - First demo video on Cemu emulator: https://www.youtube.com/watch?v=7CBa9u2ip-Y
-
 - Installation tutorial on a virtual machine: https://www.youtube.com/watch?v=5PARAnrt1jU
-
 - Quick usage showcase on RPCS3: https://www.youtube.com/watch?v=KIKDO0dxYl4
 
 ## Installation
@@ -76,7 +75,7 @@ Allows you to connect an emulated Toy Pad to your PC or video-game console.
    (sudo crontab -l 2>/dev/null; echo "@reboot sudo /usr/local/bin/toypad_usb_setup.sh") | sudo crontab -
    ```
 
-5. Reboot you device with this command:
+5. Reboot your device with this command:
 
    ```bash
    sudo shutdown -r now
@@ -90,10 +89,8 @@ Allows you to connect an emulated Toy Pad to your PC or video-game console.
    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
    [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-   nvm install 11
+   nvm install 20
    sudo setcap cap_net_bind_service=+ep `readlink -f \`which node\``
-   npm install --global node-gyp@8.4.1
-   npm config set node_gyp $(npm prefix -g)/lib/node_modules/node-gyp/bin/node-gyp.js
 
    cd LD-ToyPad-Emulator
    npm install
@@ -103,7 +100,7 @@ Allows you to connect an emulated Toy Pad to your PC or video-game console.
 
 1. Start the virtual machine if it's not already running. Then start the **VirtualHere USB Client** and double click on `LEGO READER V2.10`.
 
-2. Run the emulator server with this command if you are in the correct folder (otherwise run `cd    LD-ToyPad-Emulator` first):
+2. Run the emulator server with this command if you are in the correct folder (otherwise run `cd LD-ToyPad-Emulator` first):
 
    ```bash
    npm run start
@@ -123,164 +120,266 @@ Allows you to connect an emulated Toy Pad to your PC or video-game console.
 
 #### Prerequisites
 
-- **Raspberry Pi Zero W** ($10) or **Raspberry Pi 4 B** (with `USB/Power Splitter for Raspberry Pi` from Ali or `USB-C/PWR Splitter` from pishop.us) or similar single board computer with Network support
-  - **NOTE**: Will NOT work with Raspberry Pi: 2, 3, 3A, 3A+, 3B, 3B+. These models lack the ability to become a USB gadget.
-- **USB Type-A to micro-USB 2.0 Type-B cable** that supports data transmission (e. g. your phone's charging cable)
+- One of the following supported devices:
+  - **Raspberry Pi Zero W** (~$10)
+  - **Raspberry Pi Zero 2 W** (~$15) ← recommended over the original Zero W
+  - **Raspberry Pi 4 B** (requires a USB-C power splitter — search "USB-C PWR Splitter Raspberry Pi 4" on AliExpress or pishop.us)
+  - **Raspberry Pi 5** (requires the same USB-C power splitter as the Pi 4)
+  - > **NOTE**: Will NOT work with Raspberry Pi 2, 3, 3A, 3A+, 3B, or 3B+. These models cannot act as a USB gadget.
+- **USB cable** that supports data transmission — micro-USB for the Zero/Zero 2 W, USB-C for the Pi 4/5 (a phone charging cable, not a charge-only cable)
 - 2 GB+ Micro SD card
-- Internet connection on your PC and single board computer
+- Your PC and the Pi must both have an internet connection
 
-#### Installation
+#### Step 1 — Flash the OS
 
-1. Flash Raspberry Pi OS Bullseye (Lite, either 32-bit for the Zero (W) or 64-bit for RPi 4/5) on a Micro-SD card.
+Flash **Raspberry Pi OS (Legacy, 32-bit) Lite** onto your SD card using the [Raspberry Pi Imager](https://www.raspberrypi.com/software/).
 
-2. Connect your device to your PC via USB cable (don't use the port on the edge of the Pi Zero!).
+> Lite is recommended for all Zero models as it is the lightest and most compatible option. Pi 4/5 users may use the 64-bit Lite image instead.
 
-3. Use SSH to run the following command (Don't know the IP address? Try [this IP scanner](https://www.advanced-ip-scanner.com/).) - this will prepare your Raspberry Pi to work as a USB gadget:
+**Before flashing**, click the gear/settings icon in the Imager and configure:
+- Hostname: `toypad`
+- SSH enabled, with a username and password you will remember
+- Your Wi-Fi network name and password
 
-```bash
-curl -sSL https://raw.githubusercontent.com/Berny23/LD-ToyPad-Emulator/master/pi_setup.sh | bash
-```
+> Wi-Fi must be configured here because the USB port will be used for the gadget connection, not networking.
 
-4. Reboot you device with this command:
+#### Step 2 — One-liner setup (recommended)
 
-   ```bash
-   sudo shutdown -r now
-   ```
-
-5. Reconnect to SSH, change the directory to LD-Toypad-Emulator and build the container using this command:
+Connect your Pi to power, wait for it to boot, SSH in, then run:
 
 ```bash
-podman pull \
-  ghcr.io/berny23/ld-toypad-emulator:latest\
-  --platform=linux/your-platform \
-  .
+curl -sSL https://raw.githubusercontent.com/Glitxhhh/LD-ToyPad-Emulator/master/setup.sh | bash
 ```
 
-NOTE: check the [Package Registry](https://github.com/Berny23/LD-ToyPad-Emulator/pkgs/container/ld-toypad-emulator) to find out what platform names are supported.
+This automatically detects your hardware, installs everything, configures PS4/PS5 USB compatibility, sets up mDNS, and reboots. After reboot, the emulator is available at:
 
-6. Once the container is successfully build run start the container:
+```
+http://toypad.local
+```
+
+No port number required.
+
+#### Step 2 (manual) — Run these commands instead
+
+If you prefer to set up manually:
+
+**2a. USB gadget + dependencies:**
+
+```bash
+curl -sSL https://raw.githubusercontent.com/Glitxhhh/LD-ToyPad-Emulator/master/pi_setup.sh | bash
+```
+
+**2b. Reboot:**
+
+```bash
+sudo shutdown -r now
+```
+
+**2c. After reconnecting, verify the USB gadget is ready:**
+
+```bash
+ls /dev/hidg0
+```
+
+You must see `/dev/hidg0` before continuing. If it's missing, see [/dev/hidg0 is missing after reboot](#devhidg0-is-missing-after-reboot).
+
+**2d. Pull the container image:**
+
+Choose the correct platform for your device:
+
+| Device | OS | Platform |
+|---|---|---|
+| Raspberry Pi Zero W | 32-bit Legacy Lite | `linux/arm/v6` |
+| Raspberry Pi Zero 2 W | 32-bit Legacy Lite | `linux/arm/v7` |
+| Raspberry Pi 4 / 5 | 64-bit Lite | `linux/arm64` |
+| x86-64 PC | Any | `linux/amd64` |
+
+```bash
+podman pull --platform=linux/arm/v7 ghcr.io/berny23/ld-toypad-emulator:latest
+```
+
+> **Pi Zero 2 W on 32-bit OS**: if the pull fails with `no image found for architecture arm, variant "v7"`, pull by digest instead. Find the armv7 digest on the [package registry](../../pkgs/container/ld-toypad-emulator) under the **OS / Arch** tab:
+> ```bash
+> podman pull ghcr.io/berny23/ld-toypad-emulator:latest@sha256:<digest>
+> ```
+
+**2e. Create the container:**
 
 ```bash
 podman create \
   --name ld-toypad-emulator \
-  -p 8080:80 \
+  -p 80:80 \
   --device /dev/hidg0:/dev/hidg0 \
-  # Optional: mount a host folder for persistent images
-  # -v /path/to/images:/app/server/images:Z  \
-  ld-toypad-emulator:latest
+  -v ~/LD-ToyPad-Emulator/server/images:/app/server/images:Z \
+  -v ~/LD-ToyPad-Emulator/server/index.html:/app/server/index.html:Z \
+  -v ~/LD-ToyPad-Emulator/server/stylesheets/main.css:/app/server/stylesheets/main.css:Z \
+  -v ~/LD-ToyPad-Emulator/server/scripts/main.js:/app/server/scripts/main.js:Z \
+  ghcr.io/berny23/ld-toypad-emulator:latest
 ```
+
+**2f. Start it:**
+
+```bash
+podman start ld-toypad-emulator
+```
+
+**2g. (Optional) Auto-start on boot:**
+
+```bash
+(crontab -l 2>/dev/null; echo "@reboot sleep 12 && podman start ld-toypad-emulator") | crontab -
+```
+
+**2h. (Optional) mDNS for `http://toypad.local`:**
+
+```bash
+sudo apt install -y avahi-daemon
+sudo systemctl enable --now avahi-daemon
+```
+
+After this, open `http://toypad.local` in any browser on your network — no IP address or port number needed.
 
 #### Usage
 
-1. Start the emulator container:
+Open a browser on any device on your network and go to:
 
-   ```bash
-   podman start ld-toypad-emulator
-   ```
+```
+http://toypad.local
+```
 
-2. Type **your single board computer's IP address** in a browser to use the emulator.
+or `http://<your-pi-ip>` if mDNS is not set up.
 
-   If you want to turn it off, just stop the container (`podman stop ld-tyopad-emulator`) in the terminal window, then use the command `sudo shutdown now` to safely power off the device.
+To stop the emulator:
+
+```bash
+podman stop ld-toypad-emulator
+sudo shutdown now
+```
+
+## Keyboard Shortcuts
+
+The emulator supports keyboard shortcuts for placing and removing tokens without using the mouse — useful while gaming.
+
+| Key | Action |
+|---|---|
+| Click a token | Select it (it glows yellow) |
+| `1` – `7` | Place selected token on that pad slot / return occupying token to Toy Box |
+| `0` | Deselect |
+
+Click the **⌨ Keys** button in the top-right corner of the UI for a full layout reference.
+
+## Custom Images
+
+Place PNG files in `server/images/` on your Pi (the folder is mounted into the container). Name them by character or vehicle ID:
+
+- `1.png` — primary image for character/vehicle ID 1
+- `1_1.png`, `1_2.png` — alternate images that cycle automatically every 20 seconds
+
+Character IDs: [charactermap.json](server/json/charactermap.json)  
+Vehicle IDs: [tokenmap.json](server/json/tokenmap.json)
 
 ## Update
 
-To update this software, just get the latest changes by running the following commands while inside the `LD-ToyPad-Emulator` folder:
-
 ```bash
-git pull
-podman stop ld-toypad-emulator # only if the container is currently running
+podman stop ld-toypad-emulator
 podman rm ld-toypad-emulator
-podman image rm localhost/ld-toypad-emulator:latest
+podman image rm ghcr.io/berny23/ld-toypad-emulator:latest
 ```
 
-Then rebuild and recreate the container starting from step 5 above.
-
-## Adding Images
-
-If you would like your tags to have custom images over them to personalize your experience, name your image (ID).png and place them in server/images inside the Toypad Emulator folder. If you want them to cover the entirety of the tag with no blank space, make sure your image is either 100x100 or can be scaled to that size.
-
-Character IDs can be found [here](https://github.com/Berny23/LD-ToyPad-Emulator/blob/master/server/json/charactermap.json)
-
-Vehicle IDs can be found [here](https://github.com/Berny23/LD-ToyPad-Emulator/blob/master/server/json/tokenmap.json)
+Then re-pull and re-create the container starting from Step 2d above.
 
 ## Troubleshooting
 
+### PS4 / PS5 not detecting the Toy Pad
+
+This is most commonly caused by missing USB descriptor fields in the gadget setup script. The fix is included in `usb_setup_script.sh` from v1.5.0 onwards. If you are on an older setup, replace `/usr/local/bin/toypad_usb_setup.sh` with the updated version from this repo and reboot.
+
+If using the original setup script, add these lines after the `mkdir g1 / cd g1` block:
+
+```bash
+echo "0x0200" > bcdUSB
+echo "0x0100" > bcdDevice
+echo "0x00"   > bDeviceClass
+echo "0x00"   > bDeviceSubClass
+echo "0x00"   > bDeviceProtocol
+```
+
+And after `mkdir configs/c.1`:
+
+```bash
+echo "0x80" > configs/c.1/bmAttributes
+echo "250"  > configs/c.1/MaxPower
+```
+
+Then replace the final `sleep 3` with `sleep 5` and reboot.
+
+### /dev/hidg0 is missing after reboot
+
+Run the setup script manually to see any errors:
+
+```bash
+sudo /usr/local/bin/toypad_usb_setup.sh
+```
+
+Verify `dwc2` is in the correct boot config file:
+
+```bash
+# Bookworm and newer:
+grep dwc2 /boot/firmware/config.txt
+
+# Legacy (Bullseye and older):
+grep dwc2 /boot/config.txt
+```
+
+If missing, add it and reboot:
+
+```bash
+# Bookworm and newer:
+echo "dtoverlay=dwc2" | sudo tee -a /boot/firmware/config.txt
+```
+
+### Light effects not working
+
+The pad slot colours are driven by socket events from the game (`Fade One`, `Fade All`, `Color One`, `Color All`). If the status warning has disappeared (i.e. the game has connected), the effects should work. If slots are not changing colour, try clicking **Sync** in the UI.
+
 ### RPCS3 cannot detect the Toy Pad
 
-**This solution works only for RPCS3 and will break the Toy Pad detection with every other emulator!**
+**This solution works only for RPCS3 and will break Toy Pad detection with every other emulator!**
 
-Download and run [Zadig](https://zadig.akeo.ie).
+Download and run [Zadig](https://zadig.akeo.ie). Click on `Options` and tick `List All Devices`. Select `LEGO READER V2.10`, select `WinUSB`, click `Replace Driver` and confirm. Restart RPCS3.
 
-Click on `Options` and tick `List All Devices`. Select `LEGO READER V2.10` in the dropdown menu, then select `WinUSB` if it's not already selected, click on the `Replace Driver` button and on `Yes` in the dialog.
+To undo: open Device Manager → USB devices → `LEGO READER V2.10` → Driver tab → Previous Driver.
 
-After the installation has finished, exit Zadig and restart RPCS3. If you get stuck on the main menu, just close the game, right-click on it in the RPCS3 games list, select `Change Custom Configuration`, switch to the `Network` tab and choose `Disconnected` in both drop-down menus. The game will now correctly detect the Toy Pad.
-
-To undo the changes from Zadig, you have to rollback the driver:
-
-1. Open `Device Manager`, scroll down to `USB devices` and expand the section.
-2. Double-click `LEGO READER V2.10`.
-3. Switch to the `Driver` tab, click `Previous Driver`, select the first option and click yes.
-
-**Solution for Linux systems**
-
-In order to fix this, you will need to add a custom udev rule in your system, so the software can communicate with the game. The udev rule is in the root of the server folder. (thanks to wof for sharing the rule).
-
-To add the rule, simply just move the `99-dimensions.rules` file to `/etc/udev/rules.d/` (a reboot might be required)
-
-If moving the file is not allowed, just open a terminal inside the `rules.d` folder and run this command: `sudo nano 99-dimensions.rule`, open the rule file in the server root in a text editor, copy the contents and paste it in the terminal then press Ctrl + X to save the file.
+**Linux:** move `99-dimensions.rules` from the server folder to `/etc/udev/rules.d/` and reboot.
 
 ### Webpage not reachable (Oracle VirtualBox)
 
-Shutdown your virtual machine (icon in the upper right corner). In VirtualBox's manager, click your image and open `Settings`. Under `Network` change `Attached to:` to `Bridged Adapter` and click `ok`. Start your virtual machine.
+Shutdown your VM. In VirtualBox manager, open Settings → Network → change `Attached to` to `Bridged Adapter`. Start the VM.
 
 ### Webpage not reachable (VMware)
 
-Shutdown your virtual machine (icon in the upper right corner). Right-click on your virtual machine's name in VMware Workstation or VMware Player and click `Settings...`. Click on `Network Adapter` and select `Bridged`. Click `OK` and start your virtual machine.
+Shutdown your VM. Right-click the VM → Settings → Network Adapter → select `Bridged`. Start the VM.
 
 ### Error: listen EADDRINUSE: address already in use :::80
 
-Either close any other software that is using the port 80 or manually edit the last line of index.js (with `nano index.js`, edit the line, then press `Ctrl + O`, `Enter` and `Ctrl + X`).
-
-If you did this, you may need to append your selected port to the address in the browser (like `http://debian:500` or `http://192.168.0.165:500` if your port is 500).
+Another process is using port 80. Either stop it, or edit the last line of `index.js` to use a different port and append that port to the browser URL (e.g. `http://toypad.local:8081`).
 
 ### VirtualHere USB Client doesn't show LEGO READER V2.10
 
-When installing the virtual machine, you have to set the hostname to `debian`.
-
-Alternatively, copy the following command and replace `YOUR_IP_ADDRESS` with your virtual machine's IP address (it looks like `192.168.X.X`, run `hostname -I` to show it). After you've done this, run the modified command while you're inside the `LD-ToyPad-Emulator` folder.
+The VM hostname must be set to `debian`. Alternatively, replace `YOUR_IP_ADDRESS` in this command with your VM's IP (`hostname -I`) and run it inside the `LD-ToyPad-Emulator` folder:
 
 ```bash
 git reset --hard ; printf '\necho "usbip-vudc.0" > UDC\nusbipd -D --device\nsleep 2;\nusbip attach -r YOUR_IP_ADDRESS -b usbip-vudc.0\nchmod a+rw /dev/hidg0' >> usb_setup_script.sh ; sudo cp usb_setup_script.sh /usr/local/bin/toypad_usb_setup.sh
 ```
 
-### VirtualHere shows LEGO READER V2.10, but fails with "Operation not permitted"
-
-When double clicking on "LEGO READER V2.10", if it returns `Error "Operation not permitted" (-1) trying to use this device.`. Try these steps:
-
-1. Right click the device in the VirtualHere Client and select "Custom Event Handler..."
-2. Add `onReset.$VENDOR_ID$.$PRODUCT_ID$=`
-
-Then try using the device again.
-
-### Webpage not reachable under http://debian/
-
-If you're using a virtual machine, make sure you've applied the solution specific to your software first ([VirtualBox](#webpage-not-reachable-oracle-virtualbox) or [VMware](#webpage-not-reachable-vmware))!
-
-After that, run the command `hostname -I` in your virtual machine (or on your single board computer) and type the IP address that looks like `192.168.X.X` in your webbrowser.
-
 ## Acknowledgements
 
-- **ags131** for writing one of the main NodeJS libraries I'm using: [https://www.npmjs.com/package/node-ld](https://www.npmjs.com/package/node-ld). My project would've been impossible to create without this guy's research.
-
-- **cort1237** for implementing writing data (like vehicle upgrades) to toy tags, as well as several user interface updates and support for saving toy tags locally.
-
-- **benlucaslaws** for improving the user experience and implementing a complete filtering system for vehicle/character abilities and game worlds.
-
-- **DaPiMan** for helping with missing or misplaced vehicle IDs and other improvements.
-
-- **Euniemeansme** for adding/fixing character and vehicle abilities and other data improvements.
-
-- **VladimirKuletski** for creating/updating CI workflows for automated testing via GitHub Actions.
+- **ags131** for writing one of the main NodeJS libraries used: [https://www.npmjs.com/package/node-ld](https://www.npmjs.com/package/node-ld)
+- **cort1237** for implementing vehicle upgrade persistence and UI updates
+- **benlucaslaws** for the filtering system for vehicle/character abilities and game worlds
+- **DaPiMan** for vehicle ID corrections and other improvements
+- **Euniemeansme** for character/vehicle ability data improvements
+- **VladimirKuletski** for CI workflow automation
+- **Glitxh** for the v1.5.0 UI overhaul, dark mode, keyboard shortcuts, image cycling, and PS4/PS5 USB compatibility fix
 
 ## License
 
