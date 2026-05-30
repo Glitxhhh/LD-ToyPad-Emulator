@@ -6,13 +6,13 @@
 */
 
 const ld = require("node-ld");
-const fs = require("node:fs");
-const path = require("node:path");
+const fs = require("fs");
+const path = require("path");
 
 //Setup Webserver
 const express = require("express");
 const app = express();
-const http = require("node:http");
+const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
@@ -213,6 +213,10 @@ function RGBToHex(r, g, b) {
     case "#f00016":
       return "#ff2de6";
 
+    //batman stealth
+    case "#000018":
+      return "#0000ff";
+
     //shift keystone (dark colors for blink animation)
     case "#002007":
       return "#007575";
@@ -246,7 +250,7 @@ function RGBToHex(r, g, b) {
 
     //element keystone
     case "#000016":
-      return "#0000ff";
+      return "#00ffff"; // fork: cyan (upstream uses #0000ff / blue, but cyan is correct here)
     case "#006700":
       return "#00ff00";
 
